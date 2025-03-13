@@ -17,8 +17,8 @@ namespace our {
         unsigned int VAO;
         // We need to remember the number of elements that will be draw by glDrawElements 
         GLsizei elementCount;
-        void setVertexAttribPointer(GLuint index, GLint size, GLenum type, size_t offset) {
-            glVertexAttribPointer(index, size, type, false, sizeof(Vertex), (void*)offset);
+        void setVertexAttribPointer(GLuint index, GLint size, GLenum type, size_t offset,GLboolean normalized = GL_FALSE){
+            glVertexAttribPointer(index, size, type, normalized, sizeof(Vertex), (void*)offset);
             glEnableVertexAttribArray(index);
         }
         void initializeBuffers(){
@@ -60,7 +60,7 @@ namespace our {
             setVertexAttribPointer(ATTRIB_LOC_POSITION,3,GL_FLOAT,offsetof(Vertex,position));
 
             //Define Second Attribute: color
-            setVertexAttribPointer(ATTRIB_LOC_COLOR,4,GL_UNSIGNED_INT,offsetof(Vertex,color));
+            setVertexAttribPointer(ATTRIB_LOC_COLOR,4,GL_UNSIGNED_INT,offsetof(Vertex,color),GL_TRUE);
 
             //Define Third Attribute: Texture Coordinates
             setVertexAttribPointer(ATTRIB_LOC_TEXCOORD,2,GL_FLOAT,offsetof(Vertex,tex_coord));
