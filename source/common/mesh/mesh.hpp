@@ -17,6 +17,21 @@ namespace our {
         unsigned int VAO;
         // We need to remember the number of elements that will be draw by glDrawElements 
         GLsizei elementCount;
+        void setVertexAttribPointer(GLuint index, GLint size, GLenum type, size_t offset) {
+            glVertexAttribPointer(index, size, type, false, sizeof(Vertex), (void*)offset);
+            glEnableVertexAttribArray(index);
+        }
+        void initializeBuffers(){
+            glGenBuffers(1,&VBO);
+            glGenBuffers(1,&EBO);
+            glGenVertexArrays(1,&VAO);
+        }
+
+        void setDataInBuffer(GLenum type, GLuint buffer, GLsizeiptr size, const void* data){
+            glBindBuffer(type,buffer);
+            glBufferData(type,size,data,GL_STATIC_DRAW);
+        }
+
     public:
 
         // The constructor takes two vectors:
@@ -31,18 +46,46 @@ namespace our {
             //TODO: (Req 2) Write this function
             // remember to store the number of elements in "elementCount" since you will need it for drawing
             // For the attribute locations, use the constants defined above: ATTRIB_LOC_POSITION, ATTRIB_LOC_COLOR, etc
-            
+            elementCount = static_cast<GLsizei>(elements.size());
+
+            //First We create our buffers (Vertex Buffer, Element Buffer and Vertex Array to describe how to read from the vertex buffer
+            initializeBuffers();
+            // We Need to bind with these buffers in order to define the needed things
+            glBindVertexArray(VAO);
+
+            setDataInBuffer(GL_ARRAY_BUFFER,VBO, sizeof(vertices),vertices.data());
+
+            setDataInBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO, sizeof(elements),elements.data());
+            // Define First Attribute: position
+            setVertexAttribPointer(ATTRIB_LOC_POSITION,3,GL_FLOAT,offsetof(Vertex,position));
+
+            //Define Second Attribute: color
+            setVertexAttribPointer(ATTRIB_LOC_COLOR,4,GL_UNSIGNED_INT,offsetof(Vertex,color));
+
+            //Define Third Attribute: Texture Coordinates
+            setVertexAttribPointer(ATTRIB_LOC_TEXCOORD,2,GL_FLOAT,offsetof(Vertex,tex_coord));
+
+            //Define Last Attribute: Normal
+            setVertexAttribPointer(ATTRIB_LOC_NORMAL,3,GL_FLOAT,offsetof(Vertex,normal));
+
+            glBindVertexArray(0);
         }
 
         // this function should render the mesh
         void draw() 
         {
             //TODO: (Req 2) Write this function
+            glBindVertexArray(VAO);
+            glDrawElements(GL_TRIANGLES,elementCount,GL_UNSIGNED_INT, nullptr);
+            glBindVertexArray(0);
         }
 
         // this function should delete the vertex & element buffers and the vertex array object
         ~Mesh(){
             //TODO: (Req 2) Write this function
+            glDeleteVertexArrays(1, &VAO);
+            glDeleteBuffers(1, &VBO);
+            glDeleteBuffers(1, &EBO);
         }
 
         Mesh(Mesh const &) = delete;
