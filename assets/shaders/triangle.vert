@@ -24,22 +24,18 @@ void main(){
     vec3 position;
     if(gl_VertexID == 0){
         position = vec3(-0.5, -0.5, 0.0);
+        vs_out.color = vec3(1.0, 0.0, 0.0);
     }else if(gl_VertexID == 1){
         position = vec3(0.5, -0.5, 0.0);
+        vs_out.color = vec3(0.0, 1.0, 0.0);
+
     }else{
         position = vec3(0.0, 0.5, 0.0);
+        vs_out.color = vec3(0.0, 0.0, 1.0);
     }
 
     position = vec3(scale.x * position.x + translation.x, scale.y * position.y + translation.y, 0.0);
 
     gl_Position = vec4(position, 1.0);
-
-    if(gl_VertexID == 0){
-        vs_out.color = vec3(1.0, 0.0, 0.0);
-    }else if(gl_VertexID == 1){
-        vs_out.color = vec3(0.0, 1.0, 0.0);
-    }else{
-        vs_out.color = vec3(0.0, 0.0, 1.0);
-    }
-
+    
 }
