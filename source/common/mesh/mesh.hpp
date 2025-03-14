@@ -53,14 +53,14 @@ namespace our {
             // We Need to bind with these buffers in order to define the needed things
             glBindVertexArray(VAO);
 
-            setDataInBuffer(GL_ARRAY_BUFFER,VBO, sizeof(vertices),vertices.data());
+            setDataInBuffer(GL_ARRAY_BUFFER,VBO, vertices.size() * sizeof(Vertex),vertices.data());
 
-            setDataInBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO, sizeof(elements),elements.data());
+            setDataInBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO, elements.size() * sizeof(unsigned int),elements.data());
             // Define First Attribute: position
             setVertexAttribPointer(ATTRIB_LOC_POSITION,3,GL_FLOAT,offsetof(Vertex,position));
 
             //Define Second Attribute: color
-            setVertexAttribPointer(ATTRIB_LOC_COLOR,4,GL_UNSIGNED_INT,offsetof(Vertex,color),GL_TRUE);
+            setVertexAttribPointer(ATTRIB_LOC_COLOR,4,GL_UNSIGNED_BYTE,offsetof(Vertex,color),GL_TRUE);
 
             //Define Third Attribute: Texture Coordinates
             setVertexAttribPointer(ATTRIB_LOC_TEXCOORD,2,GL_FLOAT,offsetof(Vertex,tex_coord));
