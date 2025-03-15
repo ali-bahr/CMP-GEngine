@@ -9,8 +9,11 @@ namespace our {
     // Remember that the order of transformations is: Scaling, Rotation then Translation
     // HINT: to convert euler angles to a rotation matrix, you can use glm::yawPitchRoll
     glm::mat4 Transform::toMat4() const {
-        //TODO: (Req 3) Write this function
-        return glm::mat4(1.0f); 
+        glm::mat4 TransformationMatrix = glm::mat4(1.0f);
+        TransformationMatrix = TransformationMatrix *  glm::translate(glm::mat4(1.0f), position);
+        TransformationMatrix = TransformationMatrix * glm::yawPitchRoll(rotation.y, rotation.x, rotation.z)  ;
+        TransformationMatrix = TransformationMatrix* glm::scale(glm::mat4(1.0f), scale);
+        return TransformationMatrix;
     }
 
      // Deserializes the entity data and components from a json object
