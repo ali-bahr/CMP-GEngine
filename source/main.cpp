@@ -16,10 +16,14 @@
 #include "states/material-test-state.hpp"
 #include "states/entity-test-state.hpp"
 #include "states/renderer-test-state.hpp"
+#include <pthread.h>
+#include <filesystem>
 
 
 int main(int argc, char** argv) {
-
+    std::cout << "Current working directory: " 
+    << std::filesystem::current_path() 
+    << std::endl;
 
     flags::args args(argc, argv); // Parse the command line arguments
     // config_path is the path to the json file containing the application configuration
