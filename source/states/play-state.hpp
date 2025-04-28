@@ -7,6 +7,7 @@
 #include <systems/free-camera-controller.hpp>
 #include <systems/movement.hpp>
 #include <asset-loader.hpp>
+#include <systems/game-actions.hpp>
 
 // This state shows how to use the ECS framework and deserialization.
 class Playstate: public our::State {
@@ -47,6 +48,10 @@ class Playstate: public our::State {
         if(keyboard.justPressed(GLFW_KEY_ESCAPE)){
             // If the escape  key is pressed in this frame, go to the play state
             getApp()->changeState("menu");
+        }else if (keyboard.justPressed(GLFW_KEY_F))
+        {
+            std::cout<<"Flashlight\n";
+            our::GameActionsSystem::toggleFlash();
         }
     }
 

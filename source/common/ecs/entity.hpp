@@ -28,7 +28,8 @@ namespace our {
 
         glm::mat4 getLocalToWorldMatrix() const; // Computes and returns the transformation from the entities local space to the world space
         void deserialize(const nlohmann::json&); // Deserializes the entity data and components from a json object
-        
+        void deserialize(const nlohmann::json &data, glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale);
+
         // This template method create a component of type T,
         // adds it to the components map and returns a pointer to it 
         template<typename T>
@@ -116,6 +117,7 @@ namespace our {
             for(auto componentPtr: this->components){
                 delete componentPtr;
             }
+            components.clear();
         }
 
         // Entities should not be copyable

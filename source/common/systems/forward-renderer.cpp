@@ -1,6 +1,7 @@
 #include "forward-renderer.hpp"
 #include "../mesh/mesh-utils.hpp"
 #include "../texture/texture-utils.hpp"
+#include "./game-actions.hpp"
 #include <iostream>
 
 bool flag=0;
@@ -181,7 +182,11 @@ namespace our
                 if (light)
                 {
                 
-                //     if (light->lightType == SPOT)
+                    if(!GameActionsSystem::getFlash()){
+                        //std::cout<<"Flash is disabled"<<std::endl;
+                        continue;
+                    }
+                                    //     if (light->lightType == SPOT)
                 //         light->position = playerPosition;
                 //     else if (light->lightType == POINT)
                 //         light->position.z = playerPosition.z + light->displacement;
@@ -245,7 +250,7 @@ namespace our
             //check if this has light material or not 
             if(auto material_light=dynamic_cast<LightingMaterial*>(command.material);material_light)
             {
-                //std::cout<<"LightingMaterial found"<<std::endl;
+               // std::cout<<"LightingMaterial found"<<std::endl;
 
                 
                 //send the data to fragment shader 
@@ -264,7 +269,7 @@ namespace our
                 
                 for(int i=0;i<lights.size();i++)
                 {
-                    std::cout<<"lights["<<i<<"]->position ( "<<lights[i]->position.r<<" ,"<<lights[i]->position.g<<" ,"<<lights[i]->position.b<<" )"<<std::endl;
+                    //std::cout<<"lights["<<i<<"]->position ( "<<lights[i]->position.r<<" ,"<<lights[i]->position.g<<" ,"<<lights[i]->position.b<<" )"<<std::endl;
                     material_light->shader->set("lights[" + std::to_string(i) + "].position", lights[i]->position);
                     // std::cout<<"lights[i]->position ( "<<lights[i]->position.r<<" ,"<<lights[i]->position.g<<" ,"<<lights[i]->position.b<<" )"<<std::endl;
                     material_light->shader->set("lights["+std::to_string(i)+"].type",lights[i]->lightType);

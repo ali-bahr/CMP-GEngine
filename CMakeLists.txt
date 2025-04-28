@@ -48,6 +48,11 @@ set(COMMON_SOURCES
         source/common/mesh/mesh-utils.hpp
         source/common/mesh/mesh-utils.cpp
 
+        source/common/maze/maze.hpp
+        source/common/maze/maze.cpp
+        source/common/maze/maze_utils.hpp
+        source/common/maze/maze_utils.cpp
+
         source/common/texture/sampler.hpp
         source/common/texture/sampler.cpp
         source/common/texture/texture2d.hpp
@@ -85,6 +90,8 @@ set(COMMON_SOURCES
         source/common/systems/forward-renderer.cpp
         source/common/systems/free-camera-controller.hpp
         source/common/systems/movement.hpp
+        source/common/systems/game-actions.hpp
+        source/common/systems/game-actions.cpp
 )
 
 # Define the directories in which to search for the included headers

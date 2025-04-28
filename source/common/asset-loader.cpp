@@ -8,6 +8,8 @@
 #include "mesh/mesh-utils.hpp"
 #include "material/material.hpp"
 #include "deserialize-utils.hpp"
+#include "maze/maze_utils.hpp"
+#include "maze/maze.hpp"
 
 namespace our {
 
@@ -97,6 +99,17 @@ namespace our {
         }
     };
 
+    template <>
+    void AssetLoader<Maze>::deserialize(const nlohmann::json &data)
+    {
+        if (data.is_object())
+        {
+            std::string path = data.value("path", "");
+            std::cout << "path" << path << std::endl;
+            assets["maze"] = maze_utils::loadMaze(path);
+        }
+    };
+
     void deserializeAllAssets(const nlohmann::json& assetData){
         if(!assetData.is_object()) return;
         if(assetData.contains("shaders"))
@@ -109,6 +122,9 @@ namespace our {
             AssetLoader<Mesh>::deserialize(assetData["meshes"]);
         if(assetData.contains("materials"))
             AssetLoader<Material>::deserialize(assetData["materials"]);
+        if(assetData.contains("maze")){
+            AssetLoader<Maze>::deserialize(assetData["maze"]);
+        }
     }
 
     void clearAllAssets(){

@@ -59,9 +59,12 @@ namespace our {
             Texture2D *specular;
             Texture2D *emissive;
             Texture2D *roughness;
-            Texture2D *ambient_occlusion;
-            Sampler* sampler;
-    
+            Texture2D *ambientOcclusion;
+            Sampler* samplerAlbedo;
+            Sampler* samplerSpecular;
+            Sampler* samplerRoughness;
+            Sampler* samplerAmbientOcclusion;
+            Sampler* samplerEmissive;    
             void setup() const override;
             void deserialize(const nlohmann::json& data) override;
         };

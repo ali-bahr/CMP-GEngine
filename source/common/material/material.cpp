@@ -71,7 +71,9 @@ namespace our {
         {
         glActiveTexture(GL_TEXTURE0);
         albedo->bind();
-        sampler->bind(0);
+        if(samplerAlbedo){
+            samplerAlbedo->bind(0);
+        }
         shader->set("material.albedo", 0);
         }
         //specular
@@ -79,7 +81,9 @@ namespace our {
         {
         glActiveTexture(GL_TEXTURE1);
         specular->bind();
-        sampler->bind(1);
+        if(samplerSpecular){
+            samplerSpecular->bind(1);
+        }
         shader->set("material.specular", 1);
         }
         if(emissive!=nullptr)
@@ -87,7 +91,9 @@ namespace our {
         //emissive
         glActiveTexture(GL_TEXTURE2);
         emissive->bind();
-        sampler->bind(2);
+        if(samplerEmissive){
+            samplerEmissive->bind(2);
+        }
         shader->set("material.emissive", 2);
         }
         if(roughness!=nullptr)
@@ -95,15 +101,19 @@ namespace our {
         //roughness
         glActiveTexture(GL_TEXTURE3);
         roughness->bind();
-        sampler->bind(3);
+        if(samplerRoughness){
+            samplerRoughness->bind(3);
+        }
         shader->set("material.roughness", 3);
         }
-        if(ambient_occlusion!=nullptr)
+        if(ambientOcclusion!=nullptr)
         {
         //ambient_occlusion
         glActiveTexture(GL_TEXTURE4);
-        ambient_occlusion->bind();
-        sampler->bind(4);
+        ambientOcclusion->bind();
+        if(samplerAmbientOcclusion){
+            samplerAmbientOcclusion->bind(4);
+        }
         shader->set("material.ambient_occlusion", 4);
         }
     }
@@ -116,8 +126,12 @@ namespace our {
         specular = AssetLoader<Texture2D>::get(data.value("specular", ""));
         emissive = AssetLoader<Texture2D>::get(data.value("emissive", ""));
         roughness = AssetLoader<Texture2D>::get(data.value("roughness", ""));
-        ambient_occlusion = AssetLoader<Texture2D>::get(data.value("ambient_occlusion", ""));
-        sampler = AssetLoader<Sampler>::get(data.value("sampler", ""));
+        ambientOcclusion = AssetLoader<Texture2D>::get(data.value("ambient_occlusion", ""));
+        samplerAlbedo = AssetLoader<Sampler>::get(data.value("samplerAlbedo", ""));
+        samplerSpecular = AssetLoader<Sampler>::get(data.value("samplerSpecular", ""));
+        samplerRoughness = AssetLoader<Sampler>::get(data.value("samplerRoughness", ""));
+        samplerAmbientOcclusion = AssetLoader<Sampler>::get(data.value("samplerAmbientOcclusion", ""));
+        samplerEmissive = AssetLoader<Sampler>::get(data.value("samplerEmissive", ""));    
     }
 
 }
