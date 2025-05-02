@@ -85,6 +85,24 @@ set(COMMON_SOURCES
         source/common/components/component-deserializer.hpp
         source/common/components/light.hpp
         source/common/components/light.cpp
+        source/common/components/bolt.hpp
+        source/common/components/bolt.cpp
+        source/common/components/coin.hpp
+        source/common/components/coin.cpp
+        source/common/components/door.hpp
+        source/common/components/door.cpp
+        source/common/components/key.hpp
+        source/common/components/key.cpp
+        source/common/components/master-key.hpp
+        source/common/components/master-key.cpp
+        source/common/components/physical-component.hpp
+        source/common/components/physical-component.cpp
+        source/common/components/portal.hpp
+        source/common/components/portal.cpp
+        source/common/components/rocket.hpp
+        source/common/components/rocket.cpp
+        source/common/components/wall.hpp
+        source/common/components/wall.cpp
 
         source/common/systems/forward-renderer.hpp
         source/common/systems/forward-renderer.cpp
@@ -92,6 +110,7 @@ set(COMMON_SOURCES
         source/common/systems/movement.hpp
         source/common/systems/game-actions.hpp
         source/common/systems/game-actions.cpp
+        source/common/systems/collision.hpp
 )
 
 # Define the directories in which to search for the included headers

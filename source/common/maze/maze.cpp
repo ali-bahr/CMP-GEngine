@@ -18,13 +18,13 @@ void our::Maze::deserialize(const nlohmann::json &data)
         bool hasExitKey=false;
         for (const auto &row : data["matrix"])
         {
-            std::vector<char> temp_row;
+            std::vector<char> temp_row; //filling the row
             for (const auto &cell : row)
             {
                 temp_row.push_back(cell.get<std::string>()[0]); // Convert string to char
-                if (cell.get<std::string>()[0] == 'c') // Check if cell is 'c'
+                if (cell.get<std::string>()[0] == 'c') // Check if cell is camera
                     hasCamera = true;
-                if (cell.get<std::string>()[0] == 'm') // Check if cell is 'm'
+                if (cell.get<std::string>()[0] == 'm') // Check if cell is Master Key
                     hasExitKey = true;
             }
             tmpMazeMatrix.push_back(temp_row);
@@ -33,11 +33,11 @@ void our::Maze::deserialize(const nlohmann::json &data)
         int paddedRows = rows + 2;
         int paddedColumns = columns + 2;
         std::vector<std::vector<char>> paddedMatrix(paddedRows, std::vector<char>(paddedColumns, ' '));
-        for (int j = 1; j < paddedColumns-1; ++j) {
+        for (int j = 1; j < paddedColumns-1; ++j) { //top and bottom walls
         paddedMatrix[0][j] = '-';
         paddedMatrix[paddedRows - 1][j] = '-';
        }
-        for (int i = 0; i < paddedRows; ++i) {
+        for (int i = 0; i < paddedRows; ++i) { // right and left walls
         paddedMatrix[i][0] = '|';
         paddedMatrix[i][paddedColumns - 1] = '|';
       }

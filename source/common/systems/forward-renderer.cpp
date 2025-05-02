@@ -142,6 +142,7 @@ namespace our
     void ForwardRenderer::render(World *world)
     {
         // First of all, we search for a camera and for all the mesh renderers
+        world->deleteMarkedEntities();
         CameraComponent *camera = nullptr;
         opaqueCommands.clear();
         transparentCommands.clear();

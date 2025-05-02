@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <application.hpp>
 #include <shader/shader.hpp>
 #include <texture/texture2d.hpp>
@@ -34,7 +35,7 @@ struct Button {
 };
 
 // This state shows how to use some of the abstractions we created to make a menu.
-class Menustate: public our::State {
+class   Menustate: public our::State {
 
     // A meterial holding the menu shader and the menu texture to draw
     our::TexturedMaterial* menuMaterial;
@@ -48,17 +49,21 @@ class Menustate: public our::State {
     std::array<Button, 2> buttons;
 
     void onInitialize() override {
-        // First, we create a material for the menu's background
+
         menuMaterial = new our::TexturedMaterial();
+
+        // First, we create a material for the menu's backgroun        menuMaterial = new our::TexturedMaterial();
         // Here, we load the shader that will be used to draw the background
         menuMaterial->shader = new our::ShaderProgram();
         menuMaterial->shader->attach("assets/shaders/textured.vert", GL_VERTEX_SHADER);
         menuMaterial->shader->attach("assets/shaders/textured.frag", GL_FRAGMENT_SHADER);
         menuMaterial->shader->link();
         // Then we load the menu texture
-        menuMaterial->texture = our::texture_utils::loadImage("assets/textures/menu.png");
+        menuMaterial->texture = our::texture_utils::loadImage("assets/textures/menu3.png");
+
+        std::cout<<"MENU OpenGL: "<<menuMaterial->texture->getOpenGLName()<<std::endl;
         // Initially, the menu material will be black, then it will fade in
-        menuMaterial->tint = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        menuMaterial->tint = glm::vec4(0.0f, 0.5f, 1.0f, 0.0f);
 
         // Second, we create a material to highlight the hovered buttons
         highlightMaterial = new our::TintedMaterial();
@@ -80,7 +85,7 @@ class Menustate: public our::State {
         // Note that the texture coordinates at the origin is (0.0, 1.0) since we will use the 
         // projection matrix to make the origin at the the top-left corner of the screen.
         rectangle = new our::Mesh({
-            {{0.0f, 0.0f, 0.0f}, {255, 255, 255, 255}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+            {{0.0f, 0.0f, 0.0f}, {255, 255, 120, 255}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
             {{1.0f, 0.0f, 0.0f}, {255, 255, 255, 255}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
             {{1.0f, 1.0f, 0.0f}, {255, 255, 255, 255}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
             {{0.0f, 1.0f, 0.0f}, {255, 255, 255, 255}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},

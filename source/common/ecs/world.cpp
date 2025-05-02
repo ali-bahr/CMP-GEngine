@@ -155,14 +155,18 @@ namespace our
             // }
             if (symbol == 'p' || symbol == 'r' || symbol == 's')
             {
+                std::cout<<"Total Powerups: "<<mazeObjects[symbol].size()<<std::endl;
                 our::GameActionsSystem::setTotalPowerups(mazeObjects[symbol].size());
             }
             else if (symbol == 'k')
             {
+                std::cout<<"Total Keys: "<<mazeObjects[symbol].size()<<std::endl;
                 our::GameActionsSystem::setTotalKeys(mazeObjects[symbol].size());
             }
             else if (symbol == 'o')
             {
+                std::cout<<"Total Coins: "<<mazeObjects[symbol].size()<<std::endl;
+
                 our::GameActionsSystem::setTotalCoins(mazeObjects[symbol].size());
             }
             else if(symbol =='c')

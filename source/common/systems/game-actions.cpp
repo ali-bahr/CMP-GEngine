@@ -43,6 +43,7 @@ namespace our
     {
         score += 100;
         coins_collected++;
+        std::cout << "Coins collected: " << coins_collected << std::endl;
     }
     void GameActionsSystem::resetScore()
     {
@@ -91,6 +92,7 @@ namespace our
     {
         score += 500;
         powerups_collected++;
+        std::cout<<"Powerups collected: " << powerups_collected << std::endl;
     }
     float &GameActionsSystem::getPowerupTimer(powerups powerup)
     {
@@ -190,6 +192,7 @@ namespace our
     {
         score += 200;
         keys_collected++;
+        std::cout << "Keys collected: " << keys_collected << std::endl;
     }
     unsigned short int GameActionsSystem::getKeysCollected()
     {

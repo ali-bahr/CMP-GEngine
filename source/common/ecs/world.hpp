@@ -7,6 +7,7 @@
 #include "../maze/maze.hpp"
 #include <json/json.hpp>
 
+
 namespace our
 {
 
@@ -60,6 +61,8 @@ namespace our
         // The elements in the "markedForRemoval" set will be removed and deleted when "deleteMarkedEntities" is called.
         void markForRemoval(Entity *entity)
         {
+
+            std::cout << "Marking entity for removal" << std::endl;
             // TODO: (Req 8) If the entity is in this world, add it to the "markedForRemoval" set.
             if (entities.find(entity) != entities.end())
                 this->markedForRemoval.insert(entity);

@@ -15,7 +15,7 @@ namespace our
         void deserialize(const nlohmann::json &data);
         std::vector<std::vector<char>> getMazeMatrix()
         {
-            std::cout<<"getMazeMatrix:"<<mazeMatrix.size()<<std::endl;
+            //std::cout<<"getMazeMatrix:"<<mazeMatrix.size()<<std::endl;
 
 
             return mazeMatrix;
