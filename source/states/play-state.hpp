@@ -5,8 +5,10 @@
 #include <ecs/world.hpp>
 #include <systems/forward-renderer.hpp>
 #include <systems/free-camera-controller.hpp>
+#include <systems/collision.hpp>
 #include <systems/movement.hpp>
 #include <asset-loader.hpp>
+#include <systems/game-actions.hpp>
 
 // This state shows how to use the ECS framework and deserialization.
 class Playstate: public our::State {
@@ -15,6 +17,7 @@ class Playstate: public our::State {
     our::ForwardRenderer renderer;
     our::FreeCameraControllerSystem cameraController;
     our::MovementSystem movementSystem;
+    our::CollisionSystem collisionSystem;
 
     void onInitialize() override {
         // First of all, we get the scene configuration from the app config
@@ -29,6 +32,8 @@ class Playstate: public our::State {
         }
         // We initialize the camera controller system since it needs a pointer to the app
         cameraController.enter(getApp());
+        collisionSystem.enter(getApp());
+
         // Then we initialize the renderer
         auto size = getApp()->getFrameBufferSize();
         renderer.initialize(size, config["renderer"]);
@@ -38,15 +43,22 @@ class Playstate: public our::State {
         // Here, we just run a bunch of systems to control the world logic
         movementSystem.update(&world, (float)deltaTime);
         cameraController.update(&world, (float)deltaTime);
+        collisionSystem.update(&world, (float)deltaTime);
+
         // And finally we use the renderer system to draw the scene
         renderer.render(&world);
+        renderer.updateFogTime((float)glfwGetTime());
 
         // Get a reference to the keyboard object
         auto& keyboard = getApp()->getKeyboard();
 
         if(keyboard.justPressed(GLFW_KEY_ESCAPE)){
             // If the escape  key is pressed in this frame, go to the play state
-            getApp()->changeState("menu");
+            getApp()->changeState("score");
+        }else if (keyboard.justPressed(GLFW_KEY_F))
+        {
+            std::cout<<"Flashlight\n";
+            our::GameActionsSystem::toggleFlash();
         }
     }
 

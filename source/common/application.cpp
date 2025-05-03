@@ -9,6 +9,7 @@
 #include <queue>
 #include <tuple>
 #include <filesystem>
+#include <systems/game-actions.hpp>
 
 #include <flags/flags.h>
 
@@ -23,6 +24,7 @@
 #endif
 
 #include "texture/screenshot.hpp"
+#include "maze/maze.hpp"
 
 std::string default_screenshot_filepath() {
     std::stringstream stream;
@@ -206,6 +208,13 @@ int our::Application::run(int run_for_frames) {
     ImGuiIO& io = ImGui::GetIO();
     ImGui::StyleColorsDark();
 
+    ImFont *playFont = io.Fonts->AddFontFromFileTTF("assets/fonts/chary.ttf", 30.0f);
+    ImFont *powerupFont = io.Fonts->AddFontFromFileTTF("assets/fonts/HalloweenSlimePersonalUse.otf", 40.0f);
+
+    // for hover effect
+    ImVec4 textColorCollect = ImVec4(1.0f, 1.0f, 1.0f, 0.5f);
+    ImVec4 textColorTimer = ImVec4(1.0f, 1.0f, 1.0f, 0.5f);
+    ImGui::StyleColorsDark();
     // Initialize ImGui for GLFW and OpenGL
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
@@ -238,9 +247,19 @@ int our::Application::run(int run_for_frames) {
     // The time at which the last frame started. But there was no frames yet, so we'll just pick the current time.
     double last_frame_time = glfwGetTime();
     int current_frame = 0;
+    int mazeTimeInSec = 0;
 
     //Game loop
     while(!glfwWindowShouldClose(window)){
+
+        // game over timer
+        static float game_over_timer = 0;
+        // time to display in any state
+        int display_time = mazeTimeInSec + 5 - game_over_timer;
+        std::ostringstream mins_stream, secs_stream;
+        mins_stream << std::setw(2) << std::setfill('0') << std::to_string(display_time / 60);
+        secs_stream << std::setw(2) << std::setfill('0') << std::to_string(display_time % 60);
+        std::string timer_display = mins_stream.str() + ":" + secs_stream.str();
         if(run_for_frames != 0 && current_frame >= run_for_frames) break;
         glfwPollEvents(); // Read all the user events and call relevant callbacks.
 
@@ -255,7 +274,352 @@ int our::Application::run(int run_for_frames) {
         // For example, if you're focusing on an input and writing "W", the keyboard object shouldn't record this event.
         keyboard.setEnabled(!io.WantCaptureKeyboard, window);
         mouse.setEnabled(!io.WantCaptureMouse, window);
+        if (currentState == states["play"])
+        {
 
+            // std::cout << "PLAY STATE" << std::endl;
+
+
+
+            // Time is Up
+
+            if (display_time == 0)
+            {
+                our::GameActionsSystem::setGameOver();
+                currentState->getApp()->changeState("score");
+            }
+            if (our::GameActionsSystem::getGameState() == endState::win)
+            {
+                std::cout << "YOU WON!" << std::endl;
+                currentState->getApp()->changeState("score");
+                
+            }
+            // increment the timer
+            if (!our::GameActionsSystem::getOpenDoor())
+            {
+                game_over_timer += ImGui::GetIO().DeltaTime;
+            }
+            // collectable sub window
+            {
+
+                ImGui::SetNextWindowSize(ImVec2(300, 200));
+                ImGui::PushStyleColor(ImGuiCol_Text, textColorCollect);
+                // start window GUI
+                ImGui::Begin("COLLECTED", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+                ImGui::SetWindowPos("COLLECTED", ImVec2(10, 10));
+                ImVec2 collectWindowPos = ImGui::GetWindowPos();
+                ImVec2 collectWindowSize = ImGui::GetWindowSize();
+                float collectWindowLeft = collectWindowPos.x;
+                float collectWindowRight = collectWindowPos.x + collectWindowSize.x;
+                float collectWindowTop = collectWindowPos.y;
+                float collectWindowBottom = collectWindowPos.y + collectWindowSize.y;
+
+                // Mouse position
+                ImVec2 mousePos = ImGui::GetIO().MousePos;
+
+                // Check if mouse is within CollectWindow boundaries
+                if (mousePos.x >= collectWindowLeft && mousePos.x <= collectWindowRight &&
+                    mousePos.y >= collectWindowTop && mousePos.y <= collectWindowBottom)
+                {
+                    // Increase the opacity of the text when the mouse is hovering over TimerWindow
+                    textColorCollect.w = 1.0f; // Set alpha component to 1.0 for full opacity
+                }
+                else
+                {
+                    // Decrease the opacity of the text when the mouse is not hovering over TimerWindow
+                    textColorCollect.w = 0.5f; // Set alpha component to 0.5 for half opacity
+                }
+                // set the position of the Mission mini sub window
+
+                ImGuiStyle *style = &ImGui::GetStyle();
+
+                ImVec4 *colors = style->Colors;
+
+                // set the color for window background
+                colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_Border] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGrip] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGripActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ScrollbarGrab] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ScrollbarBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+
+                ImGui::PushFont(playFont);
+                // write collectables
+                std::string string1 = "COINS: ";
+                std::string coins = std::to_string(our::GameActionsSystem::getCoinsCollected());
+                std::string stringLine1 = string1 + coins + "/" + std::to_string(our::GameActionsSystem::getTotalCoins());
+
+                std::string string2 = "KEYS: ";
+                std::string keys = std::to_string(our::GameActionsSystem::getKeysCollected());
+                std::string stringLine2 = string2 + keys + "/" + std::to_string(our::GameActionsSystem::getTotalKeys());
+
+                std::string string3 = "EXIT KEY: ";
+                std::string exit_key; //
+                if (our::GameActionsSystem::getExitKey())
+                {
+                    exit_key = "COLLECTED";
+                }
+                else
+                {
+                    exit_key = "NOT YET";
+                }
+                std::string stringLine3 = string3 + exit_key;
+                // write it in the window
+                ImGui::Text(stringLine1.c_str());
+                ImGui::Text(stringLine2.c_str());
+                ImGui::Text(stringLine3.c_str());
+
+                // pop the font after writing
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::End();
+            }
+
+            // timer sub window
+            {
+                ImGui::SetNextWindowSize(ImVec2(300, 200));
+                ImGui::PushStyleColor(ImGuiCol_Text, textColorTimer);
+                // start window GUI
+                ImGui::Begin("TIMER", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+                // set the position of the Mission mini sub window
+                ImGui::SetWindowPos("TIMER", ImVec2(win_config.size.x - 100, 10));
+                ImVec2 timerWindowPos = ImGui::GetWindowPos();
+                ImVec2 timerWindowSize = ImGui::GetWindowSize();
+                float timerWindowLeft = timerWindowPos.x;
+                float timerWindowRight = timerWindowPos.x + timerWindowSize.x;
+                float timerWindowTop = timerWindowPos.y;
+                float timerWindowBottom = timerWindowPos.y + timerWindowSize.y;
+
+                // Mouse position
+                ImVec2 mousePos = ImGui::GetIO().MousePos;
+
+                // Check if mouse is within TimerWindow boundaries
+                if (mousePos.x >= timerWindowLeft && mousePos.x <= timerWindowRight &&
+                    mousePos.y >= timerWindowTop && mousePos.y <= timerWindowBottom)
+                {
+                    // Increase the opacity of the text when the mouse is hovering over TimerWindow
+                    textColorTimer.w = 1.0f; // Set alpha component to 1.0 for full opacity
+                }
+                else
+                {
+                    // Decrease the opacity of the text when the mouse is not hovering over TimerWindow
+                    textColorTimer.w = 0.5f; // Set alpha component to 0.5 for half opacity
+                }
+
+                ImGui::PushFont(playFont);
+                // write collectables
+
+                // write it in the window
+                ImGui::Text(timer_display.c_str());
+
+                // pop the font after writing
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::End();
+            }
+            // powerup popup message
+            const float messageDuration1 = 8.0f; // Duration of the message in seconds
+            if (our::GameActionsSystem::getSpeedUp())
+            {
+                ImGui::PushFont(powerupFont);
+                ImGui::Begin("POWERUP", &(our::GameActionsSystem::getSpeedUp()), ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+                ImGui::SetWindowPos("POWERUP", ImVec2(win_config.size.x / 2 - 250, 30));
+                ImGui::Text("SPEED UP POWERUP ACQUIRED !");
+                ImGui::PopFont();
+                ImGui::End();
+
+                // Update message timer
+                our::GameActionsSystem::increasePowerupTimer(our::powerups::speedUp, ImGui::GetIO().DeltaTime);
+
+                // If message duration elapsed, hide the message
+                if (our::GameActionsSystem::getPowerupTimer(our::powerups::speedUp) >= messageDuration1)
+                {
+                    our::GameActionsSystem::resetSpeedUp();
+                    our::GameActionsSystem::resetPowerupTimer(our::powerups::speedUp); // Reset the timer for future messages
+                }
+            }
+            const float messageDuration2 = 5.0f; // Duration of the message in seconds
+            if (our::GameActionsSystem::getGravityUp())
+            {
+                ImGui::PushFont(powerupFont);
+                ImGui::Begin("POWERUP2", &(our::GameActionsSystem::getGravityUp()), ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+                ImGui::SetWindowPos("POWERUP2", ImVec2(win_config.size.x / 2 - 250, 200));
+                ImGui::Text("GRAVITY POWERUP ACQUIRED !");
+                ImGui::PopFont();
+                ImGui::End();
+
+                // Update message timer
+                our::GameActionsSystem::increasePowerupTimer(our::powerups::gravityUp, ImGui::GetIO().DeltaTime);
+
+                // If message duration elapsed, hide the message
+                if (our::GameActionsSystem::getPowerupTimer(our::powerups::gravityUp) >= messageDuration2)
+                {
+                    our::GameActionsSystem::resetGravityUp();
+                    our::GameActionsSystem::setGravityDown();
+                    our::GameActionsSystem::resetPowerupTimer(our::powerups::gravityUp);
+                }
+            }
+            if (our::GameActionsSystem::getGravityDown())
+            {
+                our::GameActionsSystem::increasePowerupTimer(our::powerups::gravityUp, ImGui::GetIO().DeltaTime);
+
+                // If message duration elapsed, hide the message
+                if (our::GameActionsSystem::getPowerupTimer(our::powerups::gravityUp) >= messageDuration2)
+                {
+                    our::GameActionsSystem::resetGravityDown();
+                    our::GameActionsSystem::resetPowerupTimer(our::powerups::gravityUp);
+                }
+            }
+            if (our::GameActionsSystem::getPortal())
+            {
+                ImGui::PushFont(powerupFont);
+                ImGui::Begin("POWERUP3", &(our::GameActionsSystem::getPortal()), ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+                ImGui::SetWindowPos("POWERUP3", ImVec2(win_config.size.x / 2 - 250, 80));
+                ImGui::Text("PORTAL POWERUP ACQUIRED");
+                ImGui::PopFont();
+                ImGui::End();
+            }
+
+            const float messageDuration3 = 2.0f; // Duration of the message in seconds
+            static float timer_alert = 0;
+            if (our::GameActionsSystem::getCantCollectMasterKey())
+            {
+                timer_alert += ImGui::GetIO().DeltaTime;
+                ImGui::PushFont(powerupFont);
+                ImGui::Begin("ALERT", &(our::GameActionsSystem::getCantCollectMasterKey()), ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+                ImGui::SetWindowPos("ALERT", ImVec2(win_config.size.x / 2 - 250, 500));
+                ImGui::Text("Get THE REMAINING KEYS FIRST");
+                ImGui::PopFont();
+                ImGui::End();
+                if (timer_alert >= messageDuration3)
+                {
+                    timer_alert = 0;
+                    our::GameActionsSystem::resetCantCollectMasterKey();
+                }
+            }
+            static float timer_alert2 = 0;
+            if (our::GameActionsSystem::getTouchDoor())
+            {
+                timer_alert2 += ImGui::GetIO().DeltaTime;
+                ImGui::PushFont(powerupFont);
+                ImGui::Begin("ALERT2", &(our::GameActionsSystem::getTouchDoor()), ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+                ImGui::SetWindowPos("ALERT2", ImVec2(win_config.size.x / 2 - 250, 400));
+                ImGui::Text("Get THE EXIT KEY FIRST");
+                ImGui::PopFont();
+                ImGui::End();
+                if (timer_alert2 >= messageDuration3)
+                {
+                    timer_alert2 = 0;
+                    our::GameActionsSystem::resetTouchDoor();
+                }
+            }
+            const float openDoorTimer = 5.0f;
+            if (our::GameActionsSystem::getOpenDoor())
+            {
+                std::cout << "DOOR OPEN in APP!" << std::endl;
+                our::GameActionsSystem::increasePowerupTimer(powerups::door, ImGui::GetIO().DeltaTime);
+                std::cout << "DOOR POWERUP APP:"<<our::GameActionsSystem::getPowerupTimer(powerups::door) << std::endl;
+                if (our::GameActionsSystem::getPowerupTimer(powerups::door) > openDoorTimer)
+                {
+                    std::cout << "DOOR POWERUP TIMEOUT, Game Win!" << std::endl;
+                    our::GameActionsSystem::resetOpenDoor();
+                    our::GameActionsSystem::setGameWin();
+                }
+            }
+            {
+                if (our::GameActionsSystem::getFlash())
+                {
+                    our::GameActionsSystem::increasePowerupTimer(powerups::flash, ImGui::GetIO().DeltaTime);
+                    float progress = 1.0f - our::GameActionsSystem::getPowerupTimer(powerups::flash) / our::GameActionsSystem::flashLightTimeOut;
+                    our::GameActionsSystem::setFlashProgress(progress);
+                    if (our::GameActionsSystem::getFlashProgress() <= 0)
+                    {
+                        our::GameActionsSystem::resetFlash();
+                    }
+                }
+                ImGui::Begin("FLASH CHARGE", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.4f, 0.8f, 1.0f, 1.0f)); // Progress bar fill color (light blue)
+                ImGui::SetWindowPos("FLASH CHARGE", ImVec2(50, 600));
+                ImGui::Text("BATTERY");
+                ImGui::ProgressBar(our::GameActionsSystem::getFlashProgress(), ImVec2(100.0f, 30.0f));
+                ImGui::PopStyleColor(1);
+                ImGui::End();
+            }
+        }
+        else if (currentState == states["score"])
+        {
+
+
+            {
+
+                ImGui::SetNextWindowSize(ImVec2(1000, 1000));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+                // start window GUI
+                ImGui::Begin("EXIT", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+                ImGui::SetWindowPos("EXIT", ImVec2(win_config.size.x / 2 - 180, win_config.size.y / 2 - 150));
+                ImVec2 collectWindowPos = ImGui::GetWindowPos();
+                ImVec2 collectWindowSize = ImGui::GetWindowSize();
+                float collectWindowLeft = collectWindowPos.x;
+                float collectWindowRight = collectWindowPos.x + collectWindowSize.x;
+                float collectWindowTop = collectWindowPos.y;
+                float collectWindowBottom = collectWindowPos.y + collectWindowSize.y;
+
+                ImGuiStyle *style = &ImGui::GetStyle();
+
+                ImVec4 *colors = style->Colors;
+
+                // set the color for window background
+                colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_Border] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGrip] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGripActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ScrollbarGrab] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ScrollbarBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+
+                ImGui::PushFont(powerupFont);
+                std::string string1;
+                if (our::GameActionsSystem::getGameState() == endState::lose)
+                {
+                    string1 = "GAME OVER :(";
+                }
+                else if (our::GameActionsSystem::getGameState() == endState::play)
+                {
+                    string1 = "YOU QUITTED ;(";
+                }
+                else
+                {
+                    string1 = "CONGRATULATIONS :)";
+                }
+                std::string string2 = "SCORE: ";
+                string2 += " " + std::to_string(our::GameActionsSystem::getScore());
+                std::string string3 = "COINS COLLECTED: ";
+                string3 += std::to_string(our::GameActionsSystem::getCoinsCollected()) + "/" + std::to_string(our::GameActionsSystem::getTotalCoins());
+                std::string string4 = "KEYS COLLECTED: ";
+                string4 += " " + std::to_string(our::GameActionsSystem::getKeysCollected()) + "/" + std::to_string(our::GameActionsSystem::getTotalKeys());
+                std::string string5 = "POWERUPS COLLECTED: ";
+                string5 += " " + std::to_string(our::GameActionsSystem::getPowerupsCollected()) + "/" + std::to_string(our::GameActionsSystem::getTotalPowerups());
+                std::string string6 = "REMAINING TIME: ";
+                string6 += timer_display;
+
+                ImGui::Text(string1.c_str());
+                ImGui::Text(string2.c_str());
+                ImGui::Text(string3.c_str());
+                ImGui::Text(string4.c_str());
+                ImGui::Text(string5.c_str());
+                ImGui::Text(string6.c_str());
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::End();
+            }
+        }
         // Render the ImGui commands we called (this doesn't actually draw to the screen yet.
         ImGui::Render();
 
@@ -313,15 +677,28 @@ int our::Application::run(int run_for_frames) {
         mouse.update();
 
         // If a scene change was requested, apply it
-        while(nextState){
-            // If a scene was already running, destroy it (not delete since we can go back to it later)
-            if(currentState) currentState->onDestroy();
-            // Switch scenes
-            currentState = nextState;
-            nextState = nullptr;
-            // Initialize the new scene
-            currentState->onInitialize();
-        }
+       // If a scene change was requested, apply it
+       while (nextState)
+       {
+           // If a scene was already running, destroy it (not delete since we can go back to it later)
+           if (currentState)
+               currentState->onDestroy();
+           // Switch scenes
+           currentState = nextState;
+
+           currentState->onInitialize();
+
+           // reset the gameover timer
+           if (currentState == states["play"])
+           {
+               mazeTimeInSec = our::AssetLoader<our::Maze>::get("maze")->getMazeTime();
+               std::cout<<"Maze time in sec: "<<mazeTimeInSec<<std::endl;
+               GameActionsSystem::loadFlashLightTimeOut();
+               game_over_timer = 0;
+           }
+           nextState = nullptr;
+           // Initialize the new scene
+       }
 
         ++current_frame;
     }

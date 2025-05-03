@@ -4,6 +4,7 @@
 #include "../components/camera.hpp"
 #include "../components/mesh-renderer.hpp"
 #include "../asset-loader.hpp"
+#include "../components/light.hpp"
 
 #include <glad/gl.h>
 #include <vector>
@@ -40,6 +41,8 @@ namespace our
         GLuint postprocessFrameBuffer, postProcessVertexArray;
         Texture2D *colorTarget, *depthTarget;
         TexturedMaterial* postprocessMaterial;
+        //vector hold the light component from the entities that has light components 
+        std::vector<LightComponent*> lights;
     public:
         // Initialize the renderer including the sky and the Postprocessing objects.
         // windowSize is the width & height of the window (in pixels).
@@ -49,7 +52,8 @@ namespace our
         // This function should be called every frame to draw the given world
         void render(World* world);
 
-
+        void updateFogTime(float time);
+   
     };
 
 }

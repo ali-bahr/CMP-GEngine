@@ -16,6 +16,8 @@ namespace our {
         glm::mat4 toMat4() const;
          // Deserializes the entity data and components from a json object
         void deserialize(const nlohmann::json&);
+        void set(glm::vec3 &position, glm::vec3 &rotation, glm::vec3 &scale);
+
     };
 
 }
