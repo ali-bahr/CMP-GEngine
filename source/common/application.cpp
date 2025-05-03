@@ -24,6 +24,7 @@
 #endif
 
 #include "texture/screenshot.hpp"
+#include "maze/maze.hpp"
 
 std::string default_screenshot_filepath() {
     std::stringstream stream;
@@ -276,9 +277,9 @@ int our::Application::run(int run_for_frames) {
         if (currentState == states["play"])
         {
 
-            std::cout << "PLAY STATE" << std::endl;
+            // std::cout << "PLAY STATE" << std::endl;
 
-            
+
 
             // Time is Up
 
@@ -291,6 +292,7 @@ int our::Application::run(int run_for_frames) {
             {
                 std::cout << "YOU WON!" << std::endl;
                 currentState->getApp()->changeState("score");
+                
             }
             // increment the timer
             if (!our::GameActionsSystem::getOpenDoor())
@@ -412,7 +414,7 @@ int our::Application::run(int run_for_frames) {
                 // write collectables
 
                 // write it in the window
-               // ImGui::Text(timer_display.c_str());
+                ImGui::Text(timer_display.c_str());
 
                 // pop the font after writing
                 ImGui::PopFont();
@@ -518,9 +520,12 @@ int our::Application::run(int run_for_frames) {
             const float openDoorTimer = 5.0f;
             if (our::GameActionsSystem::getOpenDoor())
             {
+                std::cout << "DOOR OPEN in APP!" << std::endl;
                 our::GameActionsSystem::increasePowerupTimer(powerups::door, ImGui::GetIO().DeltaTime);
+                std::cout << "DOOR POWERUP APP:"<<our::GameActionsSystem::getPowerupTimer(powerups::door) << std::endl;
                 if (our::GameActionsSystem::getPowerupTimer(powerups::door) > openDoorTimer)
                 {
+                    std::cout << "DOOR POWERUP TIMEOUT, Game Win!" << std::endl;
                     our::GameActionsSystem::resetOpenDoor();
                     our::GameActionsSystem::setGameWin();
                 }
@@ -548,7 +553,6 @@ int our::Application::run(int run_for_frames) {
         else if (currentState == states["score"])
         {
 
-            std::cout<<"SCORE STATE"<<std::endl;
 
             {
 
@@ -603,7 +607,7 @@ int our::Application::run(int run_for_frames) {
                 std::string string5 = "POWERUPS COLLECTED: ";
                 string5 += " " + std::to_string(our::GameActionsSystem::getPowerupsCollected()) + "/" + std::to_string(our::GameActionsSystem::getTotalPowerups());
                 std::string string6 = "REMAINING TIME: ";
-                //string6 += timer_display;
+                string6 += timer_display;
 
                 ImGui::Text(string1.c_str());
                 ImGui::Text(string2.c_str());
@@ -673,15 +677,28 @@ int our::Application::run(int run_for_frames) {
         mouse.update();
 
         // If a scene change was requested, apply it
-        while(nextState){
-            // If a scene was already running, destroy it (not delete since we can go back to it later)
-            if(currentState) currentState->onDestroy();
-            // Switch scenes
-            currentState = nextState;
-            nextState = nullptr;
-            // Initialize the new scene
-            currentState->onInitialize();
-        }
+       // If a scene change was requested, apply it
+       while (nextState)
+       {
+           // If a scene was already running, destroy it (not delete since we can go back to it later)
+           if (currentState)
+               currentState->onDestroy();
+           // Switch scenes
+           currentState = nextState;
+
+           currentState->onInitialize();
+
+           // reset the gameover timer
+           if (currentState == states["play"])
+           {
+               mazeTimeInSec = our::AssetLoader<our::Maze>::get("maze")->getMazeTime();
+               std::cout<<"Maze time in sec: "<<mazeTimeInSec<<std::endl;
+               GameActionsSystem::loadFlashLightTimeOut();
+               game_over_timer = 0;
+           }
+           nextState = nullptr;
+           // Initialize the new scene
+       }
 
         ++current_frame;
     }

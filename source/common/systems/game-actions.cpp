@@ -34,6 +34,7 @@ namespace our
     void GameActionsSystem::loadFlashLightTimeOut()
     {
         flashLightTimeOut = our::AssetLoader<our::Maze>::get("maze")->getFlashLightTimeOut();
+        std::cout<<"getFlashLightTimeOut : "<<flashLightTimeOut<<std::endl;
     }
     int GameActionsSystem::getScore()
     {
@@ -156,6 +157,7 @@ namespace our
             break;
         case powerups::door:
             powerupTimers.door += increase;
+            std::cout<<"Door powerup timer: "<<powerupTimers.door<<std::endl;
             break;
         case powerups::flash:
             powerupTimers.flash += increase;

@@ -47,13 +47,14 @@ class Playstate: public our::State {
 
         // And finally we use the renderer system to draw the scene
         renderer.render(&world);
+        renderer.updateFogTime((float)glfwGetTime());
 
         // Get a reference to the keyboard object
         auto& keyboard = getApp()->getKeyboard();
 
         if(keyboard.justPressed(GLFW_KEY_ESCAPE)){
             // If the escape  key is pressed in this frame, go to the play state
-            getApp()->changeState("menu");
+            getApp()->changeState("score");
         }else if (keyboard.justPressed(GLFW_KEY_F))
         {
             std::cout<<"Flashlight\n";

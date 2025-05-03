@@ -4,10 +4,9 @@
 #include "./game-actions.hpp"
 #include <iostream>
 
-bool flag=0;
+bool flag = 0;
 namespace our
 {
-    
 
     void ForwardRenderer::initialize(glm::ivec2 windowSize, const nlohmann::json &config)
     {
@@ -146,8 +145,8 @@ namespace our
         CameraComponent *camera = nullptr;
         opaqueCommands.clear();
         transparentCommands.clear();
-        int cnt=0;
-        lights={};
+        int cnt = 0;
+        lights = {};
         for (auto entity : world->getEntities())
         {
             // If we hadn't found a camera yet, we look for a camera in this entity
@@ -182,23 +181,24 @@ namespace our
             {
                 if (light)
                 {
-                
-                    if(!GameActionsSystem::getFlash()){
-                        //std::cout<<"Flash is disabled"<<std::endl;
+
+                    if (!GameActionsSystem::getFlash())
+                    {
+                        // std::cout<<"Flash is disabled"<<std::endl;
                         continue;
                     }
-                                    //     if (light->lightType == SPOT)
-                //         light->position = playerPosition;
-                //     else if (light->lightType == POINT)
-                //         light->position.z = playerPosition.z + light->displacement;
+                    //     if (light->lightType == SPOT)
+                    //         light->position = playerPosition;
+                    //     else if (light->lightType == POINT)
+                    //         light->position.z = playerPosition.z + light->displacement;
 
                     // std::cout << light->position.x << " " << light->position.y << " " << light->position.z << std::endl;
                     lights.push_back(light);
-                    //std::cout<<"PUSHED Light\n";
+                    // std::cout<<"PUSHED Light\n";
                 }
             }
         }
-        flag=1;
+        flag = 1;
 
         // If there is no camera, we return (we cannot render without a camera)
         if (camera == nullptr)
@@ -248,37 +248,36 @@ namespace our
         {
             command.material->shader->use();
             command.material->setup();
-            //check if this has light material or not 
-            if(auto material_light=dynamic_cast<LightingMaterial*>(command.material);material_light)
+            // check if this has light material or not
+            if (auto material_light = dynamic_cast<LightingMaterial *>(command.material); material_light)
             {
-               // std::cout<<"LightingMaterial found"<<std::endl;
+                // std::cout<<"LightingMaterial found"<<std::endl;
 
-                
-                //send the data to fragment shader 
-                material_light->shader->set("sky.top", glm::vec3    (0.0f, 0.1f, 0.5f));
+                // send the data to fragment shader
+                material_light->shader->set("sky.top", glm::vec3(0.0f, 0.1f, 0.5f));
                 material_light->shader->set("sky.horizon", glm::vec3(0.3f, 0.3f, 0.3f));
-                material_light->shader->set("sky.bottom", glm::vec3 (0.1f, 0.1f, 0.1f));
+                material_light->shader->set("sky.bottom", glm::vec3(0.1f, 0.1f, 0.1f));
 
                 material_light->shader->set("light_count", int(lights.size()));
 
                 material_light->shader->set("VP", VP);
-                material_light->shader->set("M_IT",glm::transpose(glm::inverse(command.localToWorld)));
+                material_light->shader->set("M_IT", glm::transpose(glm::inverse(command.localToWorld)));
                 glm::vec3 cameraPosition = camera->getOwner()->getLocalToWorldMatrix() * glm::vec4(0, 0, 0, 1);
 
-                material_light->shader->set("camera_position",cameraPosition);
+                material_light->shader->set("camera_position", cameraPosition);
                 material_light->shader->set("M", command.localToWorld);
-                
-                for(int i=0;i<lights.size();i++)
+
+                for (int i = 0; i < lights.size(); i++)
                 {
-                    //std::cout<<"lights["<<i<<"]->position ( "<<lights[i]->position.r<<" ,"<<lights[i]->position.g<<" ,"<<lights[i]->position.b<<" )"<<std::endl;
+                    // std::cout<<"lights["<<i<<"]->position ( "<<lights[i]->position.r<<" ,"<<lights[i]->position.g<<" ,"<<lights[i]->position.b<<" )"<<std::endl;
                     material_light->shader->set("lights[" + std::to_string(i) + "].position", lights[i]->position);
                     // std::cout<<"lights[i]->position ( "<<lights[i]->position.r<<" ,"<<lights[i]->position.g<<" ,"<<lights[i]->position.b<<" )"<<std::endl;
-                    material_light->shader->set("lights["+std::to_string(i)+"].type",lights[i]->lightType);
-                    material_light->shader->set("lights["+std::to_string(i)+"].direction",lights[i]->direction);
-                    material_light->shader->set("lights["+std::to_string(i)+"].color",lights[i]->color);
-                    material_light->shader->set("lights["+std::to_string(i)+"].attenuation",lights[i]->attenuation);
+                    material_light->shader->set("lights[" + std::to_string(i) + "].type", lights[i]->lightType);
+                    material_light->shader->set("lights[" + std::to_string(i) + "].direction", lights[i]->direction);
+                    material_light->shader->set("lights[" + std::to_string(i) + "].color", lights[i]->color);
+                    material_light->shader->set("lights[" + std::to_string(i) + "].attenuation", lights[i]->attenuation);
                     // if(lights[i]->lightType==2)
-                    material_light->shader->set("lights["+std::to_string(i)+"].cone_angles",lights[i]->cone_angles);
+                    material_light->shader->set("lights[" + std::to_string(i) + "].cone_angles", lights[i]->cone_angles);
                     // std::cout << "angles (" << lights[i]->cone_angles.x << " ," << lights[i]->cone_angles.y << " )" << std::endl;
                 }
             }
@@ -329,6 +328,10 @@ namespace our
             glDrawArrays(GL_TRIANGLES, 0, 3);
             glBindVertexArray(0);
         }
+    }
+    void ForwardRenderer::updateFogTime(float time)
+    {
+        postprocessMaterial->shader->set("time", time);
     }
 
 }

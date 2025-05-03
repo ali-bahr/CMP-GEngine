@@ -172,7 +172,6 @@ namespace our{
                         else if (our::GameActionsSystem::getExitKey())
                         {
                             std::cout <<  "OPEN DOOR!" << std::endl;
-                            our::GameActionsSystem::setGameWin();
                             //our::SoundSystem::play_custom_sound("OPEN_DOOR",false,false);
                             our::GameActionsSystem::setOpenDoor();
                         }
