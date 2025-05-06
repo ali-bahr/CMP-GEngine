@@ -57,7 +57,6 @@ class Playstate: public our::State {
             getApp()->changeState("score");
         }else if (keyboard.justPressed(GLFW_KEY_F))
         {
-            std::cout<<"Flashlight\n";
             our::GameActionsSystem::toggleFlash();
         }
     }

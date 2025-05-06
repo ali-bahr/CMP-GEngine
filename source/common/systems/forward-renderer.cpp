@@ -3,7 +3,11 @@
 #include "../texture/texture-utils.hpp"
 #include "./game-actions.hpp"
 #include <iostream>
+#include <GLFW/glfw3.h>
 
+#define MAX_LIGHTS 64
+
+using namespace std;    
 bool flag = 0;
 namespace our
 {
@@ -36,6 +40,15 @@ namespace our
                 .depthTesting{true, GL_LEQUAL},
                 .blending{false}};
 
+
+                // Check for OpenGL errors
+GLenum err;
+while ((err = glGetError()) != GL_NO_ERROR)
+{
+    // Handle the error
+    cerr << "OpenGL error: " << err << std::endl;
+}
+         
             // Load the sky texture (note that we don't need mipmaps since we want to avoid any unnecessary blurring while rendering the sky)
             std::string skyTextureFile = config.value<std::string>("sky", "");
             Texture2D *skyTexture = texture_utils::loadImage(skyTextureFile, false);
@@ -135,7 +148,9 @@ namespace our
             delete postprocessMaterial->shader;
             delete postprocessMaterial;
         }
-        lights = {};
+        if(!lights.empty()){
+            lights.clear();
+         }
     }
 
     void ForwardRenderer::render(World *world)
@@ -146,7 +161,7 @@ namespace our
         opaqueCommands.clear();
         transparentCommands.clear();
         int cnt = 0;
-        lights = {};
+        lights.clear();
         for (auto entity : world->getEntities())
         {
             // If we hadn't found a camera yet, we look for a camera in this entity
@@ -177,26 +192,26 @@ namespace our
                 }
             }
             // get the light component from all entities
-            if (auto light = entity->getComponent<LightComponent>(); light)
+            if (auto lightComponent = entity->getComponent<LightComponent>(); lightComponent)
             {
-                if (light)
-                {
-
-                    if (!GameActionsSystem::getFlash())
-                    {
-                        // std::cout<<"Flash is disabled"<<std::endl;
-                        continue;
-                    }
-                    //     if (light->lightType == SPOT)
-                    //         light->position = playerPosition;
-                    //     else if (light->lightType == POINT)
-                    //         light->position.z = playerPosition.z + light->displacement;
-
-                    // std::cout << light->position.x << " " << light->position.y << " " << light->position.z << std::endl;
-                    lights.push_back(light);
-                    // std::cout<<"PUSHED Light\n";
+                if(entity->name=="flashlight" && (!our::GameActionsSystem::getFlash()||our::GameActionsSystem::getPowerupTimer(our::powerups::flash)>=our::GameActionsSystem::flashLightTimeOut))
+                {   
+                   // std::cout<<"Skipping Flashlight"<<std::endl;
+                    continue;
                 }
+                lights.push_back(lightComponent);
             }
+
+             // moving the moon in an orbit
+             if(entity->name=="moon")
+             {
+                 float centerx=(world->getXBordersOfMaze().first+world->getXBordersOfMaze().second)/2.0f;
+                 float centerz=(world->getZBordersOfMaze().first+world->getZBordersOfMaze().second)/2.0f;
+                 float mazeRadiusx=abs(world->getXBordersOfMaze().first-world->getXBordersOfMaze().second);
+                 float mazeRadiusz=abs(world->getZBordersOfMaze().first-world->getZBordersOfMaze().second);
+                 entity->localTransform.position.x=centerx+sin(glfwGetTime()*0.2)*mazeRadiusx/2.5f;
+                 entity->localTransform.position.z=centerz+cos(glfwGetTime()*0.2)*mazeRadiusz/2.5f;
+             }
         }
         flag = 1;
 
@@ -244,44 +259,50 @@ namespace our
         // TODO: (Req 9) Draw all the opaque commands
         //  Don't forget to set the "transform" uniform to be equal the model-view-projection matrix for each render command
 
+        glm::vec3 cameraPosition = camera->getOwner()->getLocalToWorldMatrix() * glm::vec4(0, 0, 0, 1);
+
         for (auto &command : opaqueCommands)
         {
             command.material->shader->use();
             command.material->setup();
-            // check if this has light material or not
-            if (auto material_light = dynamic_cast<LightingMaterial *>(command.material); material_light)
+            // if it's a light material edit it in shader            
+            if (auto lightMaterial = dynamic_cast<LightingMaterial *>(command.material); lightMaterial)
             {
-                // std::cout<<"LightingMaterial found"<<std::endl;
-
-                // send the data to fragment shader
-                material_light->shader->set("sky.top", glm::vec3(0.0f, 0.1f, 0.5f));
-                material_light->shader->set("sky.horizon", glm::vec3(0.3f, 0.3f, 0.3f));
-                material_light->shader->set("sky.bottom", glm::vec3(0.1f, 0.1f, 0.1f));
-
-                material_light->shader->set("light_count", int(lights.size()));
-
-                material_light->shader->set("VP", VP);
-                material_light->shader->set("M_IT", glm::transpose(glm::inverse(command.localToWorld)));
-                glm::vec3 cameraPosition = camera->getOwner()->getLocalToWorldMatrix() * glm::vec4(0, 0, 0, 1);
-
-                material_light->shader->set("camera_position", cameraPosition);
-                material_light->shader->set("M", command.localToWorld);
-
-                for (int i = 0; i < lights.size(); i++)
+                lightMaterial->shader->set("VP", VP);
+                lightMaterial->shader->set("camera_position", cameraPosition);
+                lightMaterial->shader->set("M", command.localToWorld);
+                lightMaterial->shader->set("M_IT", glm::transpose(glm::inverse(command.localToWorld)));
+                lightMaterial->shader->set("light_count", (int)lights.size());
+                lightMaterial->shader->set("sky.top", glm::vec3(0.0f, 0.05f, 0.1f));
+                lightMaterial->shader->set("sky.bottom", glm::vec3(0.05f, 0.05f, 0.05f));
+                lightMaterial->shader->set("sky.horizon",glm::vec3(0.1f, 0.1f, 0.1f));
+                lightMaterial->shader->set("cameraPosition", cameraPosition);
+                for (int i = 0; i < min(int(lights.size()),MAX_LIGHTS); i++)
                 {
-                    // std::cout<<"lights["<<i<<"]->position ( "<<lights[i]->position.r<<" ,"<<lights[i]->position.g<<" ,"<<lights[i]->position.b<<" )"<<std::endl;
-                    material_light->shader->set("lights[" + std::to_string(i) + "].position", lights[i]->position);
-                    // std::cout<<"lights[i]->position ( "<<lights[i]->position.r<<" ,"<<lights[i]->position.g<<" ,"<<lights[i]->position.b<<" )"<<std::endl;
-                    material_light->shader->set("lights[" + std::to_string(i) + "].type", lights[i]->lightType);
-                    material_light->shader->set("lights[" + std::to_string(i) + "].direction", lights[i]->direction);
-                    material_light->shader->set("lights[" + std::to_string(i) + "].color", lights[i]->color);
-                    material_light->shader->set("lights[" + std::to_string(i) + "].attenuation", lights[i]->attenuation);
-                    // if(lights[i]->lightType==2)
-                    material_light->shader->set("lights[" + std::to_string(i) + "].cone_angles", lights[i]->cone_angles);
-                    // std::cout << "angles (" << lights[i]->cone_angles.x << " ," << lights[i]->cone_angles.y << " )" << std::endl;
+                  // light source is at the origin in the local space can be added to light component later
+                  glm::vec3 lightPosition=lights[i]->getOwner()->getLocalToWorldMatrix()*glm::vec4(lights[i]->position,1);
+                  // light source points i negative y direction in the local space can be added to light component later
+                  glm::vec3 direction = lights[i]->getOwner()->getLocalToWorldMatrix() * glm::vec4(lights[i]->direction, 0);
+                  // make it a unit vector
+                  direction = glm::normalize(direction);
+
+                  lightMaterial->shader->set("lights[" + std::to_string(i) + "].position",lightPosition);
+                  lightMaterial->shader->set("lights[" + std::to_string(i) + "].direction",direction);
+                  lightMaterial->shader->set("lights[" + std::to_string(i) + "].color",lights[i]->color);
+                  lightMaterial->shader->set("lights[" + std::to_string(i) + "].type", (int)lights[i]->lightType);
+                  if(lights[i]->lightType!=LightType::DIRECTIONAL)
+                  {
+                    lightMaterial->shader->set("lights[" + std::to_string(i) + "].attenuation", lights[i]->attenuation);
+                  }
+                  if(lights[i]->lightType==LightType::SPOT)
+                  {
+                    lightMaterial->shader->set("lights[" + std::to_string(i) + "].cone_angles", lights[i]->cone_angles);
+                  }
                 }
             }
-            command.material->shader->set("transform", VP * command.localToWorld);
+            else{
+                command.material->shader->set("transform", VP * command.localToWorld);
+            }
             command.mesh->draw();
         }
         // If there is a sky material, draw the sky

@@ -12,8 +12,20 @@ namespace our
         // Check if the JSON data is an object
         if (!data.is_object())
             return;
-         // Read the "lightType" value from the JSON object or use the default value from the member variable
-        lightType = data.value("lightType", lightType);
+        // Read the "lightType" value from the JSON object or use the default value from the member variable
+        int type = data.value("lightType", 1);
+        if (type == 0)
+        {
+            lightType = LightType::DIRECTIONAL;
+        }
+        else if (type == 1)
+        {
+            lightType = LightType::POINT;
+        }
+        else
+        {
+            lightType = LightType::SPOT;
+        }
 
         // Read the "position" value from the JSON object or use the default value from the member variable
         position = data.value("position", glm::vec3(0.0f, 0.0f, 0.0f));
@@ -22,7 +34,7 @@ namespace our
         direction = data.value("direction", glm::vec3(0.0f, 0.0f, 0.0f));
 
         // Read the "color" value from the JSON object or use the default value from the member variable
-        color = data.value("color",  glm::vec3(0.0f, 0.0f, 0.0f));
+        color = data.value("color", glm::vec3(0.0f, 0.0f, 0.0f));
 
         // Read the "attenuation" value from the JSON object or use the default value from the member variable
         attenuation = data.value("attenuation", glm::vec3(0.0f, 0.0f, 0.0f));
@@ -32,10 +44,9 @@ namespace our
 
         // Read the "displacement" value from the JSON object or use the default value from the member variable
         displacement = data.value("displacement", 0.0f);
-        
-    
     }
-    LightComponent::~LightComponent() {
+    LightComponent::~LightComponent()
+    {
         // Can be empty, but must exist
     }
 }

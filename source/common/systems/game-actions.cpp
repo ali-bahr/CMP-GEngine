@@ -34,7 +34,7 @@ namespace our
     void GameActionsSystem::loadFlashLightTimeOut()
     {
         flashLightTimeOut = our::AssetLoader<our::Maze>::get("maze")->getFlashLightTimeOut();
-        std::cout<<"getFlashLightTimeOut : "<<flashLightTimeOut<<std::endl;
+       // std::cout<<"getFlashLightTimeOut : "<<flashLightTimeOut<<std::endl;
     }
     int GameActionsSystem::getScore()
     {
@@ -44,7 +44,7 @@ namespace our
     {
         score += 100;
         coins_collected++;
-        std::cout << "Coins collected: " << coins_collected << std::endl;
+        //std::cout << "Coins collected: " << coins_collected << std::endl;
     }
     void GameActionsSystem::resetScore()
     {
@@ -93,7 +93,7 @@ namespace our
     {
         score += 500;
         powerups_collected++;
-        std::cout<<"Powerups collected: " << powerups_collected << std::endl;
+       // std::cout<<"Powerups collected: " << powerups_collected << std::endl;
     }
     float &GameActionsSystem::getPowerupTimer(powerups powerup)
     {
@@ -157,7 +157,7 @@ namespace our
             break;
         case powerups::door:
             powerupTimers.door += increase;
-            std::cout<<"Door powerup timer: "<<powerupTimers.door<<std::endl;
+            //std::cout<<"Door powerup timer: "<<powerupTimers.door<<std::endl;
             break;
         case powerups::flash:
             powerupTimers.flash += increase;
@@ -194,7 +194,7 @@ namespace our
     {
         score += 200;
         keys_collected++;
-        std::cout << "Keys collected: " << keys_collected << std::endl;
+       // std::cout << "Keys collected: " << keys_collected << std::endl;
     }
     unsigned short int GameActionsSystem::getKeysCollected()
     {
