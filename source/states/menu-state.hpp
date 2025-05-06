@@ -17,6 +17,7 @@ struct Button {
     glm::vec2 position, size;
     // The function that should be excuted when the button is clicked. It takes no arguments and returns nothing.
     std::function<void()> action;
+    
 
     // This function returns true if the given vector v is inside the button. Otherwise, false is returned.
     // This is used to check if the mouse is hovering over the button.
@@ -107,6 +108,7 @@ class   Menustate: public our::State {
         buttons[0].position = {830.0f, 607.0f};
         buttons[0].size = {400.0f, 33.0f};
         buttons[0].action = [this](){this->getApp()->changeState("play");};
+
 
         buttons[1].position = {830.0f, 644.0f};
         buttons[1].size = {400.0f, 33.0f};

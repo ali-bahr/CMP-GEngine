@@ -11,7 +11,6 @@ namespace our
     public:
         float collisionCellX;
         float collisionCellZ;
-        std::string soundName;
         void deserialize(const nlohmann::json &data) override;
     };
 

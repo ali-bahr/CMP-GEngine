@@ -9,7 +9,7 @@
 
 #include <functional>
 #include <array>
-
+#include "../common/systems/game-actions.hpp"
 
 
 // This state shows how to use some of the abstractions we created to make a score.
