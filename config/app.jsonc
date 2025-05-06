@@ -38,13 +38,13 @@
             "fs": "assets/shaders/textured.frag"
           },
           "lighting":{
-            "vs":"assets/shaders/lighted.vert",
-            "fs":"assets/shaders/lighted.frag"
+            "vs":"assets/shaders/light.vert",
+            "fs":"assets/shaders/light.frag"
           }
         },
         "textures": {
           "moon": "assets/textures/moon.jpg",
-          "grass": "assets/textures/grass.jpg",
+          "grass": "assets/textures/grass3.jpg",
           "wood": "assets/textures/wood.jpg",
           "glass": "assets/textures/glass-panels.png",
           "monkey": "assets/textures/monkey.png",
