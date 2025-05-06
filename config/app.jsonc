@@ -91,7 +91,7 @@
           }
         },
         "maze": {
-          "path": "assets/mazes/maze3.jsonc"
+          "path": "assets/mazes/maze1.jsonc"
         },
         "materials": {
           "metal": {

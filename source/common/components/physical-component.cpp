@@ -12,6 +12,5 @@ namespace our
 
         collisionCellX = data.value("collisionCellX", 12.9f);
         collisionCellZ = data.value("collisionCellZ", 12.9f);
-        soundName = data.value("soundName", "");
     }
 }

@@ -35,7 +35,7 @@ namespace our{
             if (playerPosition.x >= minX && playerPosition.x <= maxX && playerPosition.z >= minZ && playerPosition.z <= maxZ)
             {
                 // Play collision sound if given one
-                std::cout << "Collision" << std::endl;
+               // std::cout << "Collision" << std::endl;
                 return true;
             }
 
@@ -50,7 +50,7 @@ namespace our{
 
         void update(World *world, float deltaTime)
         {
-
+            // Get Player position from Camera
             CameraComponent *camera = nullptr;
             FreeCameraControllerComponent *controller = nullptr;
 
@@ -63,11 +63,12 @@ namespace our{
             }
 
             if (!(camera && controller))
-                return;
+                return; //Must be a camera entity
             Entity *entity = camera->getOwner();
 
             glm::vec3 &position = entity->localTransform.position;
 
+            // Check entity collision with coins, bolts, rockets, keys, portals, and doors
             auto entities = world->getEntities();
 
             for (auto entity : entities)
@@ -140,15 +141,15 @@ namespace our{
                     if (checkCollision(position, masterKeyPosition, entity->getComponent<MasterKeyComponent>()))
                     {
                         std::cout << "MASTER KEY!" << std::endl;
-                        // if(our::GameActionsSystem::getKeysCollected() != our::GameActionsSystem::getTotalKeys() && !our::GameActionsSystem::getCantCollectMasterKey())                        {
-                        //     our::GameActionsSystem::setCantCollectMasterKey();
-                        // }
-                        // else if (our::GameActionsSystem::getKeysCollected() == our::GameActionsSystem::getTotalKeys() )
-                        // {
+                        if(our::GameActionsSystem::getKeysCollected() != our::GameActionsSystem::getTotalKeys() && !our::GameActionsSystem::getCantCollectMasterKey())                        {
+                            our::GameActionsSystem::setCantCollectMasterKey();
+                        }
+                        else if (our::GameActionsSystem::getKeysCollected() == our::GameActionsSystem::getTotalKeys() )
+                        {
                           our::GameActionsSystem::collectExitKey();
                           world->markForRemoval(entity);
                             
-                        //}
+                        }
                        
                     }
                 }
@@ -166,13 +167,11 @@ namespace our{
                         std::cout << "DOOR!" << std::endl;
                         if(!our::GameActionsSystem::getExitKey()&& !our::GameActionsSystem::getTouchDoor())
                         {
-                            //our::SoundSystem::play_custom_sound("NOCOLLECT",false,false);
                             our::GameActionsSystem::setTouchDoor();
                         }
                         else if (our::GameActionsSystem::getExitKey())
                         {
                             std::cout <<  "OPEN DOOR!" << std::endl;
-                            //our::SoundSystem::play_custom_sound("OPEN_DOOR",false,false);
                             our::GameActionsSystem::setOpenDoor();
                         }
                     }
