@@ -608,6 +608,8 @@ int our::Application::run(int run_for_frames) {
                 string5 += " " + std::to_string(our::GameActionsSystem::getPowerupsCollected()) + "/" + std::to_string(our::GameActionsSystem::getTotalPowerups());
                 std::string string6 = "REMAINING TIME: ";
                 string6 += timer_display;
+                std::string string7 = "Press SPACE to go back to the main menu";
+                std::string string8 = "Press ESC to quit the game";
 
                 ImGui::Text(string1.c_str());
                 ImGui::Text(string2.c_str());
@@ -615,6 +617,50 @@ int our::Application::run(int run_for_frames) {
                 ImGui::Text(string4.c_str());
                 ImGui::Text(string5.c_str());
                 ImGui::Text(string6.c_str());
+                ImGui::Text(string7.c_str());
+                ImGui::Text(string8.c_str());
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::End();
+            }
+        }else if(currentState ==states["menu"]){
+            {
+
+                ImGui::SetNextWindowSize(ImVec2(1000, 1000));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+                // start window GUI
+                ImGui::Begin("EXIT", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+                ImGui::SetWindowPos("EXIT", ImVec2(win_config.size.x / 2 - 180, win_config.size.y / 2 - 150));
+                ImVec2 collectWindowPos = ImGui::GetWindowPos();
+                ImVec2 collectWindowSize = ImGui::GetWindowSize();
+                float collectWindowLeft = collectWindowPos.x;
+                float collectWindowRight = collectWindowPos.x + collectWindowSize.x;
+                float collectWindowTop = collectWindowPos.y;
+                float collectWindowBottom = collectWindowPos.y + collectWindowSize.y;
+
+                ImGuiStyle *style = &ImGui::GetStyle();
+
+                ImVec4 *colors = style->Colors;
+
+                // set the color for window background
+                colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_Border] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGrip] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGripActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ScrollbarGrab] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+                colors[ImGuiCol_ScrollbarBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.0f);
+
+                ImGui::PushFont(powerupFont);
+               
+                std::string string1 = "Press SPACE to start the game";
+                std::string string2 = "Press ESC to quit the game";
+
+                ImGui::Text(string1.c_str());
+                ImGui::Text(string2.c_str());
                 ImGui::PopFont();
                 ImGui::PopStyleColor();
                 ImGui::End();
