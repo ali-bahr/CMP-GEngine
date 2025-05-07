@@ -14,20 +14,6 @@
         "postprocess": "assets/shaders/postprocess/vignette-fog-saturation.frag"
       },
       "assets": {
-        "audio": {
-          "Game": "assets/audio/game.mp3",
-          "COLLECT": "assets/audio/collect.mp3",
-          "POWERUP": "assets/audio/powerup.mp3",
-          "WALK": "assets/audio/footsteps.flac",
-          "RUN": "assets/audio/running.mp3",
-          "NORMAL_KEY": "assets/audio/key1.wav",
-          "MASTER_KEY": "assets/audio/master-key.wav",
-          "NOCOLLECT": "assets/audio/nocollect.mp3",
-          "OPEN_DOOR": "assets/audio/door.mp3",
-          "WALL_COLLISION": "assets/audio/wallCollision.flac",
-          "DOOR_COLLISION": "assets/audio/doorCollision.flac",
-          "FLASHLIGHT": "assets/audio/flashlight.mp3"
-        },
         "shaders": {
           "tinted": {
             "vs": "assets/shaders/tinted.vert",
